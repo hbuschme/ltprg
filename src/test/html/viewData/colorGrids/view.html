@@ -16,12 +16,14 @@
             var roundMainElement = document.createElement("div");
             var roundMessagesElement = document.createElement("ul");
             var roundViewportElement = document.createElement("canvas");
+            var roundConditionElement = document.createElement("p");
 
             roundElement.setAttribute("class", "round");
             roundHeaderElement.setAttribute("class", "roundHeader");
             roundMainElement.setAttribute("class", "roundMain");
             roundMessagesElement.setAttribute("class", "messages");
             roundViewportElement.setAttribute("class", "viewport");
+            roundConditionElement.setAttribute("class", "condition");
 
             document.getElementById("rounds").appendChild(roundElement);
             roundElement.appendChild(roundHeaderElement);
@@ -29,6 +31,7 @@
             roundElement.appendChild(roundMainElement);
             roundMainElement.appendChild(roundMessagesElement);
             roundMainElement.appendChild(roundViewportElement);
+            roundMainElement.appendChild(roundConditionElement);
 
             roundViewportElement.width = 900; //roundViewportElement.offsetWidth;
             roundViewportElement.height = 300; //roundViewportElement.offsetHeight;
@@ -51,10 +54,11 @@
                 var eventJson = roundJson.events[i];
                 if (eventJson.eventType == "utterance") {
                     var messageElement = document.createElement("li");
+                    d = new Date(eventJson.time).toLocaleTimeString();
                     if (eventJson.sender == "speaker") {
-                        messageElement.innerHTML = "<b>SPEAKER: </b>" + eventJson.contents;
+                        messageElement.innerHTML = "<b>SPEAKER: </b>" + eventJson.contents + " (" + d + ")";
                     } else {
-                        messageElement.innerHTML = "<span style=\"color:#AAAAAA;\"><b>LISTENER: </b>" + eventJson.contents + "</span>";
+                        messageElement.innerHTML = "<span style=\"color:#AAAAAA;\"><b>LISTENER: </b>" + eventJson.contents + "</span>"  + " (" + d + ")";;
                     }
                     roundMessagesElement.appendChild(messageElement);
                 } else if (eventJson.eventType == "action") {
@@ -62,10 +66,12 @@
                         lClicked = parseInt(eventJson.action.lClicked);
                         mouseX = parseInt(eventJson.action.mouseX);
                         mouseY = parseInt(eventJson.action.mouseY);
+                        condition = eventJson.action.condition.name;
                     } else {
                         lClicked = parseInt(eventJson.lClicked);
                         mouseX = parseInt(eventJson.mouseX);
                         mouseY = parseInt(eventJson.mouseY);
+                        condition = eventJson.action.condition.name;
                     }
                 } else {
                     game.currStim = eventJson.state;
@@ -74,6 +80,7 @@
 
             drawScreen(game);
             drawClickedCorrectBox(game, mouseX, mouseY, lClicked);
+            roundConditionElement.innerHTML = "CONDITION: " + condition;
         }
 
         var makeGame = function(gameJson) {
